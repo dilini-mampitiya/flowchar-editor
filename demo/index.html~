@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Flowchart Editor</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/font-awesome.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/jsPlumb-defaults.css">
+        <link rel="stylesheet" href="css/flowchart.css">
+        <link rel="stylesheet" href="css/jsPlumb-demo.css">
+	</head>
+	<body>
+		<div id="flowChartView" style="display:block;">
+		    <br />
+		    <button class="btn btn-success" id="flowchartSaveBtn" onclick="" style="margin-left: 15px">Save</button><br /><br />
+		    <div style="width:100%; height: 50%; white-space:nowrap;">
+		        <span style="display: inline-block; vertical-align: top; padding: 5px; width:15%">
+		            <div id="myPalette" style="border: solid 1px gray; height: auto"><p><center><strong>Palette</strong></center></p>
+		                <div class="jtk-demo-main" style="margin-top: 20px;">
+		                    <div class="jtk-demo-canvas canvas-wide flowchart-demo" id="canvas1">
+		                        <div class="window start jsplumb-connected" id="startEv"><strong><p>start</p></strong></div>
+		                        <div class="window step jsplumb-connected-step" id="stepEv"><strong><p>step</p></strong></div>
+		                        <div class="window diamond jsplumb-connected-step" id="descEv"><strong><p class="desc-text">decision</p></strong></div>
+		                        <div class="window start jsplumb-connected-end" id="endEv"><strong><p>end</p></strong></div>
+		                    </div>
+		                </div>
+		            </div>
+		        </span>
+
+		        <span style="display: inline-block; vertical-align: top; padding: 5px; width:85%">
+		          <div id="myDiagram" style="border: solid 1px gray;;"><p><center><strong>Drawing</strong></center></p>
+		              <div class="jtk-demo-main" style="margin-top: 20px;">
+		                  <div class="jtk-demo-canvas canvas-wide flowchart-demo jtk-surface  jtk-surface-nopan" id="canvas">
+		                  </div>
+		              </div>
+		          </div>
+		        </span>
+		    </div>
+		</div>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/jsPlumb-2.0.7.js"></script>
+	<script type="text/javascript" src="js/flowchart.js"></script>
+	</body>
+</html>
