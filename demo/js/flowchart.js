@@ -363,8 +363,8 @@ jsPlumb.ready(function() {
     for (var i = 0; i < fcJson.connections.length; i++) {
       var connection = fcJson.connections[i];
       jsPlumb.connect({
-        source: $("#flowchartWindow1"),
-        target: $("#flowchartWindow2")
+        source: connection.sourceId,
+        target: connection.targetId
       });
     }
   };
