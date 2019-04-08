@@ -13,7 +13,7 @@
 	<body>
 		<div id="flowChartView" style="display:block;">
 		    <br />
-		    <button class="btn btn-success" id="flowchartSaveBtn" onclick="" style="margin-left: 15px">Save</button><br /><br />
+		    <button class="btn btn-success" id="flowchartSaveBtn" onclick="_saveFlowchart()" style="margin-left: 15px">Save</button><br/><br/>
 		    <div style="width:100%; height: 50%; white-space:nowrap;">
 		        <span style="display: inline-block; vertical-align: top; padding: 5px; width:15%">
 		            <div id="myPalette" style="border: solid 1px gray; height: auto"><p><center><strong>Palette</strong></center></p>
@@ -38,6 +38,14 @@
 		        </span>
 		    </div>
 		</div>
+		<hr/>
+		<div id="loadFlowChartPane">
+			<div class="form-group" id="fcJson">
+				<label for="comment" style="margin-left: 20px">Flowchart JSON:</label>
+				<textarea id="fcJsonText" class="form-control" rows="5" id="comment"></textarea>
+			</div>
+		</div>
+		<button class="btn btn-info" id="flowchartLoadBtn" onclick="_loadFlowChart()" style="margin-left: 100px">Load</button><br /><br />
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="js/jquery-ui.js"></script>
 	<script src="js/jsPlumb-2.0.7.js"></script>

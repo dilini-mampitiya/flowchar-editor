@@ -173,3 +173,8 @@ path, .jsplumb-endpoint {
 .jsplumb-overlay {
     background-color:transparent;
 }
+
+#fcJson {
+    width: 50%;
+    margin-left: 100px;
+}
