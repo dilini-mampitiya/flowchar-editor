@@ -1,7 +1,7 @@
 // This project was done as a PoC for the WSO2 PC. This content is shared only for the learning purpose of the users.
 var endpointList = [];
 var sourcepointList = [];
-var _saveFlowchart, elementCount = 0;
+var _saveFlowchart, _loadFlowChart, elementCount = 0;
 var jsPlumbInstance; //the jsPlumb jsPlumbInstance
 var properties = []; //keeps the properties of each element
 jsPlumb.ready(function () {
@@ -43,53 +43,53 @@ jsPlumb.ready(function () {
     },
 
     //style for the connector hover
-        connectorHoverStyle = {
-            lineWidth: 4,
-            strokeStyle: "#216477",
-            outlineWidth: 2,
-            outlineColor: "white"
-        },
-        endpointHoverStyle = {
-            fillStyle: "#216477",
-            strokeStyle: "#216477"
-        },
+    connectorHoverStyle = {
+        lineWidth: 4,
+        strokeStyle: "#216477",
+        outlineWidth: 2,
+        outlineColor: "white"
+    },
+    endpointHoverStyle = {
+        fillStyle: "#216477",
+        strokeStyle: "#216477"
+    },
 
     //the source endpoint definition from which a connection can be started
-        sourceEndpoint = {
-            endpoint: "Dot",
-            paintStyle: {
-                strokeStyle: "#7AB02C",
-                fillStyle: "transparent",
-                radius: 7,
-                lineWidth: 3
-            },
-            isSource: true,
-            connector: ["Flowchart", {stub: [40, 60], gap: 5, cornerRadius: 5, alwaysRespectStubs: true}],
-            connectorStyle: connectorPaintStyle,
-            hoverPaintStyle: endpointHoverStyle,
-            connectorHoverStyle: connectorHoverStyle,
-            EndpointOverlays: [],
-            maxConnections: -1,
-            dragOptions: {},
-            connectorOverlays: [
-                ["Arrow", {
-                    location: 1,
-                    visible: true,
-                    id: "ARROW",
-                    direction: 1
-                }]
-            ]
+    sourceEndpoint = {
+        endpoint: "Dot",
+        paintStyle: {
+            strokeStyle: "#7AB02C",
+            fillStyle: "transparent",
+            radius: 7,
+            lineWidth: 3
         },
+        isSource: true,
+        connector: ["Flowchart", {stub: [40, 60], gap: 5, cornerRadius: 5, alwaysRespectStubs: true}],
+        connectorStyle: connectorPaintStyle,
+        hoverPaintStyle: endpointHoverStyle,
+        connectorHoverStyle: connectorHoverStyle,
+        EndpointOverlays: [],
+        maxConnections: -1,
+        dragOptions: {},
+        connectorOverlays: [
+            ["Arrow", {
+                location: 1,
+                visible: true,
+                id: "ARROW",
+                direction: 1
+            }]
+        ]
+    },
 
     //definition of the target endpoint the connector would end
-        targetEndpoint = {
-            endpoint: "Dot",
-            paintStyle: {fillStyle: "#7AB02C", radius: 9},
-            maxConnections: -1,
-            dropOptions: {hoverClass: "hover", activeClass: "active"},
-            hoverPaintStyle: endpointHoverStyle,
-            isTarget: true
-        };
+    targetEndpoint = {
+        endpoint: "Dot",
+        paintStyle: {fillStyle: "#7AB02C", radius: 9},
+        maxConnections: -1,
+        dropOptions: {hoverClass: "hover", activeClass: "active"},
+        hoverPaintStyle: endpointHoverStyle,
+        isTarget: true
+    };
 
 	function makeDraggable(id, className, text){
 	    $(id).draggable({
@@ -125,7 +125,7 @@ jsPlumb.ready(function () {
     	        elementCount++;
     	        var name = "Window" + elementCount;
     	        var id = "flowchartWindow" + elementCount;
-    	        element = createElement(id);
+    	        element = createElement(id, name);
     	        drawElement(element, "#canvas", name);
     	        element = "";
 	        }
@@ -146,16 +146,16 @@ jsPlumb.ready(function () {
     var properties;
     var clicked = false;
     function loadProperties(clsName, left, top, label, startpoints, endpoints, contenteditable) {
-	properties = [];
-	properties.push({
-	    left: left,
-	    top: top,
-	    clsName: clsName,
-	    label: label,
-	    startpoints: startpoints,
-	    endpoints: endpoints,
-	    contenteditable: contenteditable
-	});
+        properties = [];
+        properties.push({
+            left: left,
+            top: top,
+            clsName: clsName,
+            label: label,
+            startpoints: startpoints,
+            endpoints: endpoints,
+            contenteditable: contenteditable
+        });
     }
 
 	//load properties of a start element once the start element in the palette is clicked
@@ -187,8 +187,8 @@ jsPlumb.ready(function () {
     });
 
     //create an element to be drawn on the canvas
-    function createElement(id) {
-        var elm = $('<div>').addClass(properties[0].clsName).attr('id', id);
+    function createElement(id, name) {
+        var elm = $('<div>').addClass(properties[0].clsName).attr('id', id).attr('name', name);
         if (properties[0].clsName.indexOf("diamond") > -1) {
             elm.outerWidth("100px");
             elm.outerHeight("100px");
@@ -250,6 +250,14 @@ jsPlumb.ready(function () {
         }
     };
 
+    function getEndpoints(elementType) {
+        switch(elementType) {
+            case "start": return [["BottomCenter"], []];
+            case "step": return [["BottomCenter"], ["TopCenter"]];
+            case "decision": return [["LeftMiddle", "RightMiddle", "BottomCenter"], ["TopCenter"]];
+            case "end": return [[], ["TopCenter"]];
+        }
+    }
 
     function drawElement(element, canvasId, name) {
         $(canvasId).append(element);
@@ -257,5 +265,81 @@ jsPlumb.ready(function () {
         jsPlumbInstance.draggable(jsPlumbInstance.getSelector(".jtk-node"), {
             grid: [20, 20]
         });
+    }
+
+    _loadFlowChart = function(flowchart) {
+        var fcJson  = JSON.parse($('#fcJsonText').val());
+        for(var i = 0; i < fcJson.numberOfElements; i++) {
+            var node = fcJson.nodes[i];
+            var endpoints = getEndpoints(node.nodeType);
+            loadProperties(node.clsName, node.positionX, node.positionY, node.label, endpoints[0], endpoints[1], false);
+            var element = createElement(node.elementId);
+            drawElement(element, '#canvas', node.elementName);
+        }
+
+        for(var i = 0; i < fcJson.connections.length; i++) {
+            var connection = fcJson.connections[i];
+            jsPlumb.connect({source: connection.sourceId, target: connection.targetId});
+        }
+    }
+
+    _saveFlowchart = function () {
+        var totalCount = 0;
+        if (elementCount > 0) {
+            var nodes = [];
+     
+            //check whether the diagram has a start element
+            var elm = $(".start.jtk-node");
+            if (elm.length == 0) {
+                alertify.error("The flowchart diagram should have a start element");
+            } else {
+                $(".jtk-node").each(function (index, element) {
+                    totalCount++;
+                    var $element = $(element);
+                    var type = $element.attr('class').toString().split(" ")[1];
+                    if (type == "step" || type == "diamond" || type == "parallelogram") {
+                        nodes.push({
+                            elementId: $element.attr('id'),
+                            elementName: $element.attr('name'),
+                            nodeType: type,
+                            positionX: parseInt($element.css("left"), 10),
+                            positionY: parseInt($element.css("top"), 10),
+                            clsName: $element.attr('class').toString(),
+                            label: $element.text(),
+                            width: $element.outerWidth(),
+                            height: $element.outerHeight()
+                        });
+                    } else {
+                        nodes.push({
+                            elementId: $element.attr('id'),
+                            elementName: $element.attr('name'),
+                            nodeType: $element.attr('class').toString().split(" ")[1],
+                            positionX: parseInt($element.css("left"), 10),
+                            positionY: parseInt($element.css("top"), 10),
+                            clsName: $element.attr('class').toString(),
+                            label: $element.text()
+                        });
+                    }
+                });
+     
+                var connections = [];
+                $.each(jsPlumbInstance.getConnections(), function (index, connection) {
+                    connections.push({
+                        connectionId: connection.id,
+                        sourceUUId: connection.endpoints[0].getUuid(),
+                        targetUUId: connection.endpoints[1].getUuid(),
+                        sourceId: connection.sourceId,
+                        targetId: connection.targetId
+                    });
+                });
+     
+                var flowchart = {};
+                flowchart.nodes = nodes;
+                flowchart.connections = connections;
+                flowchart.numberOfElements = totalCount;
+                alert(JSON.stringify(flowchart));
+                console.log(JSON.stringify(flowchart));
+            }
+        }
     }
 });
